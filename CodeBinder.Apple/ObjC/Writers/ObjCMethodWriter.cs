@@ -95,13 +95,16 @@ abstract class MethodWriter<TMethod> : ObjCCodeWriter<TMethod>
         Builder.Append(type.GetObjCType(kind, Context));
     }
 
-    protected void WriteOptionalParameters(int optionalIndex)
+    protected void WriteOptionalParameters(int optionalIndex, bool commaSeparator)
     {
+        string separator = " :";
+        if (commaSeparator)
+            separator = ", ";
         for (int i = 0; i < Item.ParameterList.Parameters.Count; i++)
         {
             var parameter = Item.ParameterList.Parameters[i];
             if (i > 0)
-                Builder.Space().Colon();
+                Builder.Append(separator);
 
             if (i < optionalIndex)
                 Builder.Append(parameter.Identifier.Text);
@@ -227,7 +230,7 @@ class MethodWriter : MethodWriter<MethodDeclarationSyntax>
             using (Builder.Bracketed(false))
             {
                 Builder.Append("self").Space().Append(MethodName).Colon();
-                WriteOptionalParameters(_optionalIndex);
+                WriteOptionalParameters(_optionalIndex, false);
             }
 
             Builder.EndOfStatement();
@@ -307,50 +310,113 @@ class ObjCConstructorWriter : MethodWriter<ConstructorDeclarationSyntax>
         }
         else
         {
-            if (_optionalIndex >= 0)
+            void declareNonDynamicConstructorContext(IMethodSymbol constructor)
             {
-                Builder.Append("return").Space();
-                using (Builder.Bracketed(false))
+                Builder.Append("SEL selector = @selector(init");
+                for (int i = 0; i < constructor.Parameters.Length; i++)
+                    Builder.Colon();
+                Builder.Append(")").EndOfStatement();
+                Builder.Append("typedef id (*NonDynamicInitializer)(id, SEL, ");
+                bool first = true;
+                foreach (var parameter in constructor.Parameters)
                 {
-                    Builder.Append("self").Space().Append("init").Colon();
-                    WriteOptionalParameters(_optionalIndex);
+                    if (first)
+                        first = false;
+                    else
+                        Builder.Comma().Space();
+
+                    Builder.Append(parameter.Type.GetObjCType(ObjCTypeUsageKind.Declaration, Context));
                 }
 
+                Builder.Append(")").EndOfStatement();
+
+                Builder.Append($"NonDynamicInitializer initNonDynamic = (NonDynamicInitializer)class_getMethodImplementation([{Item.GetDeclaredSymbol(Context)!.ContainingType.GetObjCName(Context)} class], selector)").EndOfStatement();
+            }
+
+            void invokeConstructorNonDynamic(Action writeParameters)
+            {
+                Builder.Append("initNonDynamic(self, selector, ");
+                writeParameters();
+                Builder.Append(")");
+            }
+
+            if (_optionalIndex >= 0)
+            {
+                declareNonDynamicConstructorContext(Item.GetDeclaredSymbol<IMethodSymbol>(Context));
+
+                Builder.Append("return").Space();
+                invokeConstructorNonDynamic(() => WriteOptionalParameters(_optionalIndex, true));
                 Builder.EndOfStatement();
             }
             else
             {
-                // https://stackoverflow.com/a/7185530/213871
-                Builder.Append("self = ");
+                InitializerKind initializerKind = InitializerKind.Unknown;
                 if (Item.Initializer == null)
                 {
-                    Builder.Append("[super init]").EndOfStatement();
+                    initializerKind = InitializerKind.Implicit;
                 }
                 else
                 {
-                    using (Builder.Bracketed(false))
+                    switch (Item.Initializer.ThisOrBaseKeyword.Kind())
                     {
-                        string selfIdentifier;
-                        switch (Item.Initializer.ThisOrBaseKeyword.Kind())
-                        {
-                            case SyntaxKind.ThisKeyword:
-                                selfIdentifier = "self";
-                                break;
-                            case SyntaxKind.BaseKeyword:
-                                selfIdentifier = "super";
-                                break;
-                            default:
-                                throw new Exception();
-                        }
-
-                        Builder.Append(selfIdentifier).Space().Append("init").Append(Item.Initializer.ArgumentList.Arguments, false, Context);
+                        case SyntaxKind.ThisKeyword:
+                            initializerKind = InitializerKind.This;
+                            break;
+                        case SyntaxKind.BaseKeyword:
+                            initializerKind = InitializerKind.Base;
+                            break;
+                        default:
+                            throw new NotSupportedException();
                     }
-                    Builder.EndOfStatement();
                 }
+
+                switch (initializerKind)
+                {
+                    // Why self = [super init]? https://stackoverflow.com/a/7185530/213871
+                    case InitializerKind.Implicit:
+                    {
+                        Builder.Append("self = [super init]");
+                        break;
+                    }
+                    case InitializerKind.Base:
+                    {
+                        Builder.Append("self = ").Bracketed().Append("super").Space().Append("init").Append(Item.Initializer!.ArgumentList.Arguments, false, Context).Close();
+                        break;
+                    }
+                    case InitializerKind.This:
+                    {
+                        declareNonDynamicConstructorContext(Item.Initializer!.GetSymbol<IMethodSymbol>(Context));
+                        Builder.Append("self = ");
+                        invokeConstructorNonDynamic(() =>
+                        {
+                            bool first = true;
+                            foreach (var arg in Item.Initializer!.ArgumentList.Arguments)
+                            {
+                                if (first)
+                                    first = false;
+                                else
+                                    Builder.Append(", ");
+
+                                Builder.Append(arg.Expression, Context);
+                            }
+                        });
+                        break;
+                    }
+                    default:
+                        throw new NotSupportedException();
+                }
+
+                Builder.EndOfStatement();
+
                 Builder.Append("if (self == nil)").AppendLine()
                     .IndentChild().Append("return nil").EndOfStatement().Close();
             }
         }
+    }
+
+    void writeNonDynamicCall()
+    {
+
     }
 
     protected override void WriteMethodBodyPostfixInternal()
@@ -381,6 +447,14 @@ class ObjCConstructorWriter : MethodWriter<ConstructorDeclarationSyntax>
             else
                 return "init";
         }
+    }
+
+    enum InitializerKind
+    {
+        Unknown = 0,
+        Implicit,
+        This,
+        Base,
     }
 }
 

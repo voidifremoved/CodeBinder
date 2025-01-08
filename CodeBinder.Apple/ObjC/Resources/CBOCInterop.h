@@ -8,6 +8,7 @@
 #pragma once
 
 #import <Foundation/Foundation.h>
+#import <objc/runtime.h>
 #include <CBInterop.h>
 #include <string>
 #include <utility>
