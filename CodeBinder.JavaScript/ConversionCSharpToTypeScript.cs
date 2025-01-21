@@ -22,12 +22,17 @@ public class ConversionCSharpToTypeScript : CSharpLanguageConversion<TypeScriptC
 
     public override bool NeedNamespaceMapping => false;
 
-    public override string GetMethodBaseName(IMethodSymbol symbol)
+    public override string GetMethodBaseName(IMethodSymbol symbol, string? stem)
     {
         if (symbol.MethodKind == MethodKind.Constructor)
-            return "constructor";
+        {
+            if (stem == null)
+                return "constructor";
+            else
+                return $"create{stem}";
+        }
         else
-            return base.GetMethodBaseName(symbol);
+            return base.GetMethodBaseName(symbol, stem);
     }
 
     protected override TypeScriptCompilationContext CreateCSharpCompilationContext()

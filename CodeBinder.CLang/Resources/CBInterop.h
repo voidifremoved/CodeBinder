@@ -135,7 +135,7 @@ extern "C"
 
     inline cboptbool CBCreateOptBool(cbbool value)
     {
-        return cboptbool{ (cbbool)true, value };
+        return cboptbool{ value, (cbbool)1 };
     }
 
 #ifdef __cplusplus

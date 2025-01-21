@@ -131,7 +131,7 @@ namespace CodeBinder.Apple {
         ///
         ///#import &quot;CBHandledObject.h&quot;
         ///#import &quot;../Internal/CBHandledObject.h&quot;
-        ///#import &quot;../Internal/CBOCBinderUtils.h&quot;
+        ///#import &quot;../Internal/CBOCInterop.h&quot;
         ///#import &quot;CBException.h&quot;
         ///
         ///@implementation CBHandledObjectFinalizer
@@ -148,7 +148,7 @@ namespace CodeBinder.Apple {
         ///        [self freeHandle:_handle];
         ///    }
         ///
-        ///    - [rest of string was truncated]&quot;;.
+        ///    - (vo [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CBHandledObject_mm {
             get {
@@ -162,31 +162,33 @@ namespace CodeBinder.Apple {
         /// * SPDX-License-Identifier: MIT-0
         /// */
         ///
-        ///#ifndef CB_BINDERUTILS
-        ///#define CB_BINDERUTILS
+        ///#ifndef CBOCINTEROP_HEADER
+        ///#define CBOCINTEROP_HEADER
         ///#pragma once
         ///
-        ///#import &quot;../CBOCBaseTypes.h&quot;
         ///#include &lt;cstdint&gt;
         ///#include &lt;cinttypes&gt;
+        ///#include &lt;string&gt;
+        ///#include &lt;vector&gt;
+        ///#include &lt;utility&gt;
+        ///
         ///#import &lt;Foundation/Foundation.h&gt;
+        ///#import &lt;objc/runtime.h&gt;
         ///
-        ///@interface CBBinderUtils : NSObject
-        ///+(void)setException:(NSException*)exception;
+        ///#include &lt;CBInterop.h&gt;
         ///
-        ///+(void)checkException;
+        ///#import &quot;CBHandledObject.h&quot;
+        ///#import &quot;../CBOCBaseTypes.h&quot;
         ///
-        ///+(void)keepAlive:(NSObject*)obj;
-        ///
-        ///@end
-        ///
-        ///inline void* CBGetNativeHandle(CBHandleRef* handle)
+        ///class SN2OC
         ///{
-        ///    if ( [rest of string was truncated]&quot;;.
+        ///private:
+        ///    bool m_handled;
+        ///    cbstring m_cstr;        /// [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string CBOCBinderUtils_h {
+        internal static string CBOCInterop_h {
             get {
-                return ResourceManager.GetString("CBOCBinderUtils_h", resourceCulture);
+                return ResourceManager.GetString("CBOCInterop_h", resourceCulture);
             }
         }
         
@@ -196,7 +198,7 @@ namespace CodeBinder.Apple {
         /// * SPDX-License-Identifier: MIT-0
         /// */
         ///
-        ///#import &quot;CBOCBinderUtils.h&quot;
+        ///#import &quot;CBOCInterop.h&quot;
         ///
         ///@implementation CBBinderUtils
         ///
@@ -217,43 +219,9 @@ namespace CodeBinder.Apple {
         ///@end
         ///.
         /// </summary>
-        internal static string CBOCBinderUtils_mm {
+        internal static string CBOCInterop_mm {
             get {
-                return ResourceManager.GetString("CBOCBinderUtils_mm", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to /**
-        /// * SPDX-FileCopyrightText: (C) 2020 Francesco Pretto &lt;ceztko@gmail.com&gt;
-        /// * SPDX-License-Identifier: MIT-0
-        /// */
-        ///
-        ///#ifndef CBOCINTEROP_HEADER
-        ///#define CBOCINTEROP_HEADER
-        ///#pragma once
-        ///
-        ///#import &lt;Foundation/Foundation.h&gt;
-        ///#include &lt;CBInterop.h&gt;
-        ///#include &lt;string&gt;
-        ///#include &lt;utility&gt;
-        ///
-        ///#import &quot;CBHandledObject.h&quot;
-        ///
-        ///class SN2OC
-        ///{
-        ///private:
-        ///    bool m_handled;
-        ///    cbstring m_cstr;
-        ///    NSString* __strong* m_ocstr;
-        ///
-        ///public:
-        ///    SN2OC(NSString* str)
-        ///        : m_handled(false), m_cstr{ }, m_ocstr((N [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string CBOCInterop_h {
-            get {
-                return ResourceManager.GetString("CBOCInterop_h", resourceCulture);
+                return ResourceManager.GetString("CBOCInterop_mm", resourceCulture);
             }
         }
     }

@@ -40,8 +40,8 @@ typedef struct
 
 typedef struct
 {
-    cbbool has_value;
     cbbool value;
+    cbbool has_value;
 } cboptbool;
 
 #ifdef __cplusplus

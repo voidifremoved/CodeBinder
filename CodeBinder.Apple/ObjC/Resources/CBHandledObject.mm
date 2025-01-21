@@ -5,7 +5,7 @@
 
 #import "CBHandledObject.h"
 #import "../Internal/CBHandledObject.h"
-#import "../Internal/CBOCBinderUtils.h"
+#import "../Internal/CBOCInterop.h"
 #import "CBException.h"
 
 @implementation CBHandledObjectFinalizer

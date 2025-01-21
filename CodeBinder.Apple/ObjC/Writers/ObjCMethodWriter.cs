@@ -312,7 +312,7 @@ class ObjCConstructorWriter : MethodWriter<ConstructorDeclarationSyntax>
         {
             void declareNonDynamicConstructorContext(IMethodSymbol constructor)
             {
-                Builder.Append("SEL selector = @selector(init");
+                Builder.Append("SEL selector = @selector(").Append(constructor.GetObjCName(Context));
                 for (int i = 0; i < constructor.Parameters.Length; i++)
                     Builder.Colon();
                 Builder.Append(")").EndOfStatement();
@@ -414,11 +414,6 @@ class ObjCConstructorWriter : MethodWriter<ConstructorDeclarationSyntax>
         }
     }
 
-    void writeNonDynamicCall()
-    {
-
-    }
-
     protected override void WriteMethodBodyPostfixInternal()
     {
         if (!IsStatic && _optionalIndex == -1)
@@ -443,9 +438,14 @@ class ObjCConstructorWriter : MethodWriter<ConstructorDeclarationSyntax>
         get
         {
             if (IsStatic)
+            {
                 return "initialize";
+            }
             else
-                return "init";
+            {
+                var methodSymbol = Item.GetDeclaredSymbol<IMethodSymbol>(Context);
+                return methodSymbol.GetObjCName(ObjCSymbolUsage.Declaration, Context);
+            }
         }
     }
 

@@ -29,8 +29,12 @@ static partial class ObjCExtensions
                 { new ReplacementIdentity("operator ==(String, String)", ObjCSymbolUsage.Normal), new SymbolReplacement() { Name = "CBStringEqual", Kind = SymbolReplacementKind.StaticMethod } },
                 { new ReplacementIdentity("operator !=(String, String)", ObjCSymbolUsage.Normal), new SymbolReplacement() { Name = "CBStringNotEqual", Kind = SymbolReplacementKind.StaticMethod } },
             } },
+            { "System.Array", new Dictionary<ReplacementIdentity, SymbolReplacement>() {
+                { new ReplacementIdentity("Length", ObjCSymbolUsage.Normal), new SymbolReplacement() { Name = "count", Kind = SymbolReplacementKind.Property } },
+            } },
             // NSMutableArray
             { "System.Collections.Generic.List<T>", new Dictionary<ReplacementIdentity, SymbolReplacement>() {
+                { new ReplacementIdentity("this[]", ObjCSymbolUsage.Normal), new SymbolReplacement() { Name = "objectAtIndex", SetterName = "insertObject", Kind = SymbolReplacementKind.Method } },
                 { new ReplacementIdentity("List(Int32)", ObjCSymbolUsage.Normal), new SymbolReplacement() { Name = "initWithCapacity", Kind = SymbolReplacementKind.Method } },
                 { new ReplacementIdentity("Add(T)", ObjCSymbolUsage.Normal), new SymbolReplacement() { Name = "addObject", Kind = SymbolReplacementKind.Method } },
                 { new ReplacementIdentity("Clear()", ObjCSymbolUsage.Normal), new SymbolReplacement() { Name = "removeAllObjects", Kind = SymbolReplacementKind.Method } },
@@ -100,7 +104,7 @@ static partial class ObjCExtensions
     public static bool HasObjCReplacement(this IPropertySymbol propertySymbol, [NotNullWhen(true)]out SymbolReplacement? replacement)
     {
         // TODO: look for interface/overridden class
-        if (_replacements.TryGetValue(propertySymbol.ContainingType.GetFullName(), out var replacements))
+        if (_replacements.TryGetValue(propertySymbol.ContainingType.OriginalDefinition.GetFullName(), out var replacements))
             return replacements.TryGetValue(new ReplacementIdentity(propertySymbol.Name, ObjCSymbolUsage.Normal), out replacement);
 
         replacement = null;
@@ -109,7 +113,7 @@ static partial class ObjCExtensions
 
     public static bool HasObjCReplacement(this IFieldSymbol fieldSymbol, [NotNullWhen(true)]out SymbolReplacement? replacement)
     {
-        if (_replacements.TryGetValue(fieldSymbol.ContainingType.GetFullName(), out var replacements))
+        if (_replacements.TryGetValue(fieldSymbol.ContainingType.OriginalDefinition.GetFullName(), out var replacements))
             return replacements.TryGetValue(new ReplacementIdentity(fieldSymbol.Name, ObjCSymbolUsage.Normal), out replacement);
 
         replacement = null;

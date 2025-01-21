@@ -40,7 +40,7 @@ static class ObjCClasses
 // Substitute for .NET Excpetion
 OCLIBRARY_MACRO @interface CBException : NSException
 - (id)init;
-- (id)init:(NSString *)message;
+- (id)init:(NSString*)message;
 @end
 
 #endif // CB_EXCPETION
@@ -116,7 +116,7 @@ OCLIBRARY_MACRO @interface CBHandleRef : NSObject
 
     return self;
 }
-- (id)init:(NSString *)message
+- (id)init:(NSString*)message
 {
     self = [super initWithName:@"Exception" reason:message userInfo:nil];
     if (self == nil)
@@ -139,12 +139,12 @@ OCLIBRARY_MACRO @interface CBHandleRef : NSObject
 #endif // CB_IREADONLYLIST
 """;
 
-    public const string CBIEqualityCompararer_h ="""
+    public const string CBIEqualityCompararer_h = """
 #ifndef CB_IEQUALITYCOMPARARER
 #define CB_IEQUALITYCOMPARARER
 #pragma once
 
-// Substitute for .NET IReadOnlyList
+// Substitute for .NET IEqualityCompararer
 @protocol CBIEqualityCompararer
 @end
 

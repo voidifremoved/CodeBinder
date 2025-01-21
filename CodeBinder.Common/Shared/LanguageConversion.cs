@@ -46,7 +46,7 @@ public abstract class LanguageConversion
         get { return new string[] { }; }
     }
 
-    public virtual string GetMethodBaseName(IMethodSymbol symbol)
+    public virtual string GetMethodBaseName(IMethodSymbol symbol, string? stem = null)
     {
         string baseName;
         if (symbol.ExplicitInterfaceImplementations.Length == 0)
@@ -60,7 +60,10 @@ public abstract class LanguageConversion
         }
 
         HandleMethodCasing(symbol, ref baseName);
-        return baseName;
+        if (stem == null)
+            return baseName;
+        else
+            return baseName + stem;
     }
 
     /// <summary>

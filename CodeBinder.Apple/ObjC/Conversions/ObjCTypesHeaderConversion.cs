@@ -29,9 +29,9 @@ class ObjCTypesHeaderConversion : ObjCHeaderConversionWriter
         {
             builder.AppendLine($"#include <stdexcept>");
             builder.AppendLine($"#import \"../{ConversionCSharpToObjC.TypesHeader}\"");
-            // TODO: CBOCBinderUtils.h should be included in a currently missing
+            // TODO: CBOCInterop.h should be included in a currently missing
             // internal only header that only has tools for code generation
-            builder.AppendLine($"#import \"{nameof(ObjCResources.CBOCBinderUtils_h).ToObjCHeaderFilename()}\"");
+            builder.AppendLine($"#import \"{nameof(ObjCResources.CBOCInterop_h).ToObjCHeaderFilename()}\"");
         }
         else
         {
@@ -118,7 +118,7 @@ class ObjCTypesHeaderConversion : ObjCHeaderConversionWriter
     // Write a CBToString() method for this enum
     private void writeCBToStringMethod(CodeBuilder builder, string enumName, bool isFlag, List<EnumMember> members)
     {
-        builder.Append("inline").Space().Append("NSString *").Space().Append("CBToString").Parenthesized().Append(isFlag ? $"{enumName}_Options" : enumName).Space().Append("value").Close().AppendLine();
+        builder.Append("inline").Space().Append("NSString*").Space().Append("CBToString").Parenthesized().Append(isFlag ? $"{enumName}_Options" : enumName).Space().Append("value").Close().AppendLine();
         using (builder.Block())
         {
             builder.Append("switch (value)").AppendLine();

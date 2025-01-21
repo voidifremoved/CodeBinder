@@ -93,22 +93,9 @@ public static class DotnetMethodExtensions
         }
 
         if (stem == null || (conversion.OverloadFeatures?.HasFlag(enableIfMissing) ?? true))
-        {
             return conversion.GetMethodBaseName(symbol);
-        }
         else
-        {
-            if (symbol.MethodKind == MethodKind.Constructor)
-            {
-                string bindedName = stem;
-                conversion.HandleMethodCasing(symbol, ref bindedName);
-                return bindedName;
-            }
-            else
-            {
-                return conversion.GetMethodBaseName(symbol) + stem;
-            }
-        }
+            return conversion.GetMethodBaseName(symbol, stem);
     }
 
     public static bool IsGetEnumerator(this IMethodSymbol method)
@@ -493,10 +480,17 @@ public static class DotnetMethodExtensions
         return model.GetOperation(node);
     }
 
-    public static TOperation? GetOperation<TOperation>(this SyntaxNode node, ICompilationProvider provider)
+    public static TOperation GetOperation<TOperation>(this SyntaxNode node, ICompilationProvider provider)
         where TOperation : class,IOperation
     {
-        return (TOperation?)GetOperation(node, provider);
+        return GetOperation(node, provider) as TOperation ?? throw new Exception($"Unable to get operation {typeof(TOperation).Name} in syntax: {node}");
+    }
+
+    public static bool TryGetOperation<TOperation>(this SyntaxNode node, ICompilationProvider provider, [NotNullWhen(true)] out TOperation? operation)
+        where TOperation : class, IOperation
+    {
+        operation = GetOperation(node, provider) as TOperation;
+        return operation != null;
     }
 
     public static bool TryGetSymbol<TSymbol>(this SyntaxNode node, ICompilationProvider provider, [NotNullWhen(true)]out TSymbol? symbol)

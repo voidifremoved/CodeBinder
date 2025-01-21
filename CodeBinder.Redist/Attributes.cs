@@ -104,11 +104,14 @@ public sealed class OverloadBindingAttribute : CodeBinderAttribute
     /// </summary>
     public string Stem { get; private set; }
 
+    /// <summary>
+    /// Enable this overload binding if the language conversion is missing this feature
+    /// </summary>
     public OverloadFeature EnableIfMissing { get; private set; }
 
-    public OverloadBindingAttribute(string name, OverloadFeature enableIfMissing)
+    public OverloadBindingAttribute(string stem, OverloadFeature enableIfMissing)
     {
-        Stem = name;
+        Stem = stem;
         EnableIfMissing = enableIfMissing;
     }
 }

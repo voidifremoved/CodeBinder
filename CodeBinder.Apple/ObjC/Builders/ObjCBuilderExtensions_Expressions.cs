@@ -1,6 +1,7 @@
 ﻿// SPDX-FileCopyrightText: (C) 2020 Francesco Pretto <ceztko@gmail.com>
 // SPDX-License-Identifier: MIT
-using CodeBinder.CLang;
+
+using Microsoft.CodeAnalysis.Operations;
 
 namespace CodeBinder.Apple;
 
@@ -189,11 +190,17 @@ static partial class ObjCBuilderExtension
 
     public static CodeBuilder Append(this CodeBuilder builder, ArrayCreationExpressionSyntax syntax, ObjCCompilationContext context)
     {
-
         if (syntax.Initializer == null)
         {
+            var symbol = syntax.GetTypeSymbol<IArrayTypeSymbol>(context);
+            string initializerName;
+            if (symbol.ElementType.IsCLRPrimitiveType())
+                initializerName = "init"; // This will be used for boxing array
+            else
+                initializerName = "initWithCapacity";
+
             builder.Bracketed().Bracketed().Append(syntax.Type, context).Space().Append("alloc").Close()
-                .Append("init").Colon().Append(syntax.Type.RankSpecifiers[0].Sizes[0], context).Close();
+                .Append(initializerName).Colon().Append(syntax.Type.RankSpecifiers[0].Sizes[0], context).Close();
         }
         else
         {
@@ -434,8 +441,29 @@ static partial class ObjCBuilderExtension
             case SyntaxKind.NullLiteralExpression:
             {
                 var typeSymbol = syntax.GetTypeSymbol(context);
-                if (typeSymbol != null) // NOTE: Null check on nullable types doesn't infer a pointer type
-                    builder.Parenthesized().Append(typeSymbol.GetObjCType(ObjCTypeUsageKind.Pointer, context)).Close();
+                if (typeSymbol != null) 
+                {
+                    // NOTE: Null check on nullable types doesn't infer a pointer type
+                    var fullName = typeSymbol.GetFullName();
+                    switch (fullName)
+                    {
+                        case "CodeBinder.cbstring":
+                        {
+                            builder.Parenthesized().Append("NSString*").Close();
+                            break;
+                        }
+                        case "CodeBinder.cboptbool":
+                        {
+                            builder.Parenthesized().Append("NSNumber*").Close();
+                            break;
+                        }
+                        default:
+                        {
+                            builder.Parenthesized().Append(typeSymbol.GetObjCType(ObjCTypeUsageKind.Pointer, context)).Close();
+                            break;
+                        }
+                    }
+                }
 
                 return builder.Append("nil");
             }
@@ -479,8 +507,8 @@ static partial class ObjCBuilderExtension
 
         // Access "arr" type in "arr[5]" syntax
         var typeSymbol = syntax.Expression.GetTypeSymbol(context);
-        if (typeSymbol!.TypeKind == TypeKind.Array)
-            builder.Append(syntax.Expression, context).Dot().Append("data").Append(syntax.ArgumentList, true, context);
+        if (typeSymbol!.TypeKind == TypeKind.Array && ((IArrayTypeSymbol)typeSymbol).ElementType.IsCLRPrimitiveType())
+            builder.Append(syntax.Expression, context).Dot().Append("data").Append(syntax.ArgumentList, true, context);       
         else
             builder.Append(syntax.Expression, context).Append(syntax.ArgumentList, true, context);
 
@@ -637,8 +665,9 @@ static partial class ObjCBuilderExtension
                     builder.Append(arg.Expression, context);
                 }
 
-                if (type.TypeKind == TypeKind.Array)
+                if (type.TypeKind == TypeKind.Array && arg.TryGetOperation<IArgumentOperation>(context, out var operation))
                 {
+                    builder.Parenthesized().Append(operation.Parameter!.GetCLangParameterType()).Close();
                     builder.Append("CBGetNativeArray").Parenthesized(appendExpression);
                 }
                 else
@@ -664,6 +693,11 @@ static partial class ObjCBuilderExtension
                                 appendExpression();
                             }
 
+                            break;
+                        }
+                        case "CodeBinder.cboptbool":
+                        {
+                            builder.Append("CBGetOptBool").Parenthesized(appendExpression);
                             break;
                         }
                         default:

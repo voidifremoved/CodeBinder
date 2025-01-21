@@ -213,6 +213,7 @@ class ObjCArrayBoxWriter : ConversionWriter
         {
             builder.Append("@property (readonly,nonatomic)").Space().Append($"{ArrayTypeDeclaration}").Space().Append("data").EndOfStatement();
             builder.Append("@property (readonly,nonatomic)").Space().Append("NSUInteger length").EndOfStatement();
+            builder.Append("@property (readonly,nonatomic)").Space().Append("NSUInteger count").EndOfStatement();
             builder.AppendLine();
         }
 
@@ -248,6 +249,20 @@ class ObjCArrayBoxWriter : ConversionWriter
         builder.AppendLine();
 
         builder.Append($"-(NSUInteger)length");
+        if (IsHeader)
+        {
+            builder.EndOfStatement();
+        }
+        else
+        {
+            builder.AppendLine();
+            using (builder.Block())
+            {
+                builder.Append("return _length").EndOfStatement();
+            }
+        }
+
+        builder.Append($"-(NSUInteger)count");
         if (IsHeader)
         {
             builder.EndOfStatement();

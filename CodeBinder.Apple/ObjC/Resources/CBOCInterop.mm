@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT-0
  */
 
-#import "CBOCBinderUtils.h"
+#import "CBOCInterop.h"
 
 @implementation CBBinderUtils
 

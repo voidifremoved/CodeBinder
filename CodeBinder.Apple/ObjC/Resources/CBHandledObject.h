@@ -44,7 +44,7 @@ OCLIBRARY_MACRO @interface CBHandledObjectBase : CBFinalizableObject
 
 @class CBHandledObject;
 
-OCLIBRARY_MACRO @interface CBHandledObject <BaseT : CBHandledObjectBase*> : CBHandledObjectBase
+OCLIBRARY_MACRO @interface CBHandledObject <BaseT> : CBHandledObjectBase
 @end
 
 #endif // CBHANDLEDOBJECT_HEADER

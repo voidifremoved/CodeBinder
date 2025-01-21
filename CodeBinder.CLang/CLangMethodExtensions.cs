@@ -238,6 +238,21 @@ public static class CLangMethodExtensions
             return $"{type} {suffix}";
     }
 
+    public static string GetCLangParameterType(this IParameterSymbol symbol, bool cppMethod = false)
+    {
+        string? suffix;
+        var flags = DeclarationFlags.NoSubscriptSyntax;
+        if (cppMethod)
+            flags |= DeclarationFlags.CppMethod;
+
+        string type = getCLangType(symbol.Type, symbol.GetAttributes(),
+            DeclarationType.Regular, flags, out suffix);
+        if (suffix == null)
+            return type;
+        else
+            return $"{type} {suffix}";
+    }
+
     private static string getCLangType(ITypeSymbol symbol, IEnumerable<AttributeData> attributes,
         DeclarationType declType, DeclarationFlags declFlags, out string? suffix)
     {
@@ -463,6 +478,8 @@ public static class CLangMethodExtensions
                 return "cbbool*";
             case "CodeBinder.cboptbool":
                 return "cboptbool*";
+            case "CodeBinder.cbstring":
+                return "cbstring*";
             case "System.Byte":
                 return "uint8_t*";
             case "System.SByte":

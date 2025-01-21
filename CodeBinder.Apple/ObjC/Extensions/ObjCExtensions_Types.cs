@@ -465,6 +465,7 @@ static partial class ObjCExtensions
                 case SymbolKind.NamedType:
                 {
                     var namedType = (INamedTypeSymbol)symbol;
+
                     if (namedType.IsNullable())
                     {
                         string? boxTypeName;
@@ -479,6 +480,20 @@ static partial class ObjCExtensions
                     else
                     {
                         objcTypeKind = tempTypeKind.Value;
+                    }
+
+                    if (namedType.IsGenericType)
+                    {
+                        var typeBuilder = new CodeBuilder();
+                        typeBuilder.Append(objCTypeName);
+                        using (typeBuilder.TypeParameterList())
+                        {
+                            bool first = true;
+                            foreach (var parameter in namedType.TypeArguments)
+                                typeBuilder.CommaSeparator(ref first).Append(parameter, ObjCTypeUsageKind.Declaration, context);
+                        }
+
+                        objCTypeName = typeBuilder.ToString();
                     }
 
                     // NOTE: We don't append generic parameters here: ObjectiveC has only the so
@@ -529,13 +544,15 @@ static partial class ObjCExtensions
                 case SymbolKind.ArrayType:
                 {
                     var arrayType = (IArrayTypeSymbol)symbol;
-                    if (arrayType.ElementType.IsValueType && arrayType.ElementType.ShouldDiscard(context.Conversion))
+                    var tempBuilder = new CodeBuilder();
+                    tempBuilder.Append("NSMutableArray").AngleBracketed(() =>
                     {
-                        // TODO: We can partially support array of value types for ignored types
-
-                    }
-                    // TODO: the long term is just support value types as struct
-                    throw new NotSupportedException("Array type with non primitive types are not supported");
+                        writeTypeSymbol(tempBuilder, arrayType.ElementType, ObjCTypeUsageKind.Declaration, context, out _);
+                    });
+                    objCTypeName = tempBuilder.ToString();
+                    TryAdaptType(ref objCTypeName, usage, objcTypeKind);
+                    builder.Append(objCTypeName);
+                    break;
                 }
                 default:
                     throw new Exception();
@@ -548,6 +565,9 @@ static partial class ObjCExtensions
     {
         if (IsKnowSimpleObjCType(fullTypeName, typeKind, out knownObjCType, out objcTypeKind))
             return true;
+
+        if (typeKind == SymbolKind.ArrayType)
+            goto Unknown;
 
         // Known reference types
         switch (fullTypeName)
@@ -656,11 +676,14 @@ static partial class ObjCExtensions
             }
             default:
             {
-                knownObjCType = null;
-                objcTypeKind = null;
-                return false;
+                goto Unknown;
             }
         }
+
+    Unknown:
+        knownObjCType = null;
+        objcTypeKind = null;
+        return false;
     }
 
     /// <summary>
@@ -723,6 +746,7 @@ static partial class ObjCExtensions
             case TypeKind.Interface:
                 return ObjCTypeKind.Protocol;
             case TypeKind.Class:
+            case TypeKind.Array:
                 return ObjCTypeKind.Class;
             case TypeKind.Struct:
             {
@@ -780,7 +804,7 @@ static partial class ObjCExtensions
             case "System.UInt64":
             case "System.Single":
             case "System.Double":
-                typeName = "NSNumber *";
+                typeName = "NSNumber*";
                 return true;
             default:
                 typeName = null;
@@ -811,7 +835,7 @@ static partial class ObjCExtensions
                         break;
                     case ObjCTypeUsageKind.DeclarationByRef:
                     case ObjCTypeUsageKind.Pointer:
-                        type = $"{type} *";
+                        type = $"{type}*";
                         break;
                     default:
                         throw new NotSupportedException();
@@ -830,17 +854,17 @@ static partial class ObjCExtensions
                         if (typeKind == ObjCTypeKind.Protocol)
                             type = $"id<{type}>";
                         else
-                            type = $"{type} *";
+                            type = $"{type}*";
                         break;
                     }
                     case ObjCTypeUsageKind.DeclarationByRef:
                     {
                         // Handle special declaration for protocols
                         if (typeKind == ObjCTypeKind.Protocol)
-                            type = $"id<{type}> *";
+                            type = $"id<{type}>*";
                         else
                             // Ensure arc is working https://stackoverflow.com/a/39053139
-                            type = $"{type} * __strong *";
+                            type = $"{type}* __strong *";
                         break;
                     }
                     case ObjCTypeUsageKind.Normal:
