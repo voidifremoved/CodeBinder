@@ -672,7 +672,7 @@ static partial class ObjCBuilderExtension
                 }
                 else
                 {
-                    string fullname = type.GetFullNameNormalized();
+                    string fullname = type.OriginalDefinition.GetFullName();
                     switch (fullname)
                     {
                         case "System.Runtime.InteropServices.HandleRef":

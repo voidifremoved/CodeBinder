@@ -698,7 +698,24 @@ public static class DotnetMethodExtensions
     // Reference: https://github.com/dotnet/roslyn/issues/1891
     public static string GetFullName(this ISymbol symbol)
     {
-        return SymbolDisplay.ToDisplayString(symbol, DisplayFormats.FullnameFormat);
+        var ret = SymbolDisplay.ToDisplayString(symbol, DisplayFormats.FullnameFormat);
+        if (ret == "nint") // NOTE: Something strange happened with C# 9.0
+            return "System.IntPtr";
+        else
+            return ret;
+    }
+
+    /// <summary>
+    /// Get no namespace qualified name
+    /// </summary>
+    public static string GetQualifiedName(this ISymbol symbol, bool includeTypeParameters = true)
+    {
+        var ret = SymbolDisplay.ToDisplayString(symbol, includeTypeParameters
+            ? DisplayFormats.QualifiedFormat : DisplayFormats.QualifiedFormatNoTypeParameters);
+        if (ret == "nint") // NOTE: Something strange happened with C# 9.0
+            return "System.IntPtr";
+        else
+            return ret;
     }
 
     /// <summary>
@@ -712,14 +729,6 @@ public static class DotnetMethodExtensions
         return SymbolDisplay.ToDisplayString(symbol.ContainingNamespace, DisplayFormats.FullnameFormat);
     }
 
-    /// <summary>
-    /// Compute type name normalizing type parameter names (eg. List&lt;Int32&gt; -> List&lt;T&gt;)
-    /// </summary>
-    public static string GetFullNameNormalized(this ITypeSymbol symbol)
-    {
-        return SymbolDisplay.ToDisplayString(symbol.OriginalDefinition, DisplayFormats.FullnameFormat);
-    }
-
     public static bool IsNullable(this ITypeSymbol symbol)
     {
         return symbol.NullableAnnotation == NullableAnnotation.Annotated;
@@ -731,15 +740,6 @@ public static class DotnetMethodExtensions
     public static string GetNameWithParameters(this IMethodSymbol symbol)
     {
         return SymbolDisplay.ToDisplayString(symbol, DisplayFormats.NameWithParameters);
-    }
-
-    /// <summary>
-    /// Get no namespace qualified name
-    /// </summary>
-    public static string GetQualifiedName(this ISymbol symbol, bool includeTypeParameters = true)
-    {
-        return SymbolDisplay.ToDisplayString(symbol, includeTypeParameters
-            ? DisplayFormats.QualifiedFormat : DisplayFormats.QualifiedFormatNoTypeParameters);
     }
 
     public static string GetDebugName(this ISymbol symbol)
