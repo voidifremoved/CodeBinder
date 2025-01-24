@@ -79,7 +79,6 @@ static class JNIMethodExtensions
                 return "jBoolean";
             case "System.Runtime.InteropServices.HandleRef":
                 return "jHandleRef";
-            case "System.UIntPtr":
             case "System.IntPtr":
                 return "jptr";
             case "System.Byte":

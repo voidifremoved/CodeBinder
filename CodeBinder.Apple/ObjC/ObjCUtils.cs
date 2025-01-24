@@ -59,9 +59,6 @@ static class ObjCUtils
             case "System.IntPtr":
                 accessProperty = "integerValue";
                 return true;
-            case "System.UIntPtr":
-                accessProperty = "unsignedIntegerValue";
-                return true;
             case "System.Boolean":
                 accessProperty = "boolValue";
                 return true;
@@ -126,9 +123,6 @@ static class ObjCUtils
                 return true;
             case "System.IntPtr":
                 accessProperty = "numberWithInteger";
-                return true;
-            case "System.UIntPtr":
-                accessProperty = "numberWithUnsignedInteger";
                 return true;
             case "System.Boolean":
                 accessProperty = "numberWithBool";
@@ -218,9 +212,6 @@ static class ObjCUtils
             case "CodeBinder.cbstring": // NOTE: We assume it's always eagerly casted to NSString
                 typeName = "NSString*";
                 return true;
-            case "System.UIntPtr":
-                typeName = "void *";
-                return true;
             case "System.IntPtr":
                 typeName = "void *";
                 return true;
@@ -269,7 +260,6 @@ static class ObjCUtils
         {
             case "CodeBinder.Apple.NSUInteger":
             case "CodeBinder.Apple.NSInteger":
-            case "System.UIntPtr":
             case "System.IntPtr":
             case "System.Boolean":
             case "System.Byte":
@@ -299,9 +289,6 @@ static class ObjCUtils
                 return true;
             case "CodeBinder.Apple.NSInteger":
                 boxTypeName = "CBNSIntegerArray";
-                return true;
-            case "System.UIntPtr":
-                boxTypeName = "CBPtrArray";
                 return true;
             case "System.IntPtr":
                 boxTypeName = "CBPtrArray";
@@ -351,7 +338,6 @@ static class ObjCUtils
         {
             ObjCInteropType.NSUInteger => "CBNSUIntegerArray",
             ObjCInteropType.NSInteger => "CBNSIntegerArray",
-            ObjCInteropType.UIntPtr => "CBPtrArray",
             ObjCInteropType.IntPtr => "CBPtrArray",
             ObjCInteropType.Boolean => "CBBoolArray",
             ObjCInteropType.Char => "CBCharArray",
@@ -377,7 +363,6 @@ static class ObjCUtils
             {
                 ObjCInteropType.NSUInteger => "const NSUInteger *",
                 ObjCInteropType.NSInteger => "const NSInteger *",
-                ObjCInteropType.UIntPtr => "void * const *",
                 ObjCInteropType.IntPtr => "void * const *",
                 ObjCInteropType.Boolean => "const BOOL *",
                 ObjCInteropType.Char => "const char *",
@@ -400,7 +385,6 @@ static class ObjCUtils
             {
                 ObjCInteropType.NSUInteger => "NSUInteger *",
                 ObjCInteropType.NSInteger => "NSInteger *",
-                ObjCInteropType.UIntPtr => "void **",
                 ObjCInteropType.IntPtr => "void **",
                 ObjCInteropType.Boolean => "BOOL *",
                 ObjCInteropType.Char => "char *",
@@ -427,8 +411,6 @@ static class ObjCUtils
                 return "NSUInteger";
             case ObjCInteropType.NSInteger:
                 return "NSInteger";
-            case ObjCInteropType.UIntPtr:
-                return "void *";
             case ObjCInteropType.IntPtr:
                 return "void *";
             case ObjCInteropType.Boolean:
@@ -679,7 +661,6 @@ enum ObjCInteropType
 {
     NSUInteger, // This is an arithmetic type, differently than UIntPtr
     NSInteger,  // This is an arithmetic type, differently than IntPtr
-    UIntPtr,
     IntPtr,
     Boolean,
     Char,

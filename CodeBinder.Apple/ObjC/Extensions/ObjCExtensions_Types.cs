@@ -34,7 +34,6 @@ static partial class ObjCExtensions
         {
             case "System.Void":
                 return null;
-            case "System.UIntPtr":
             case "System.IntPtr":
                 return "nullptr";
             case "CodeBinder.cbbool":
@@ -791,7 +790,6 @@ static partial class ObjCExtensions
         switch (fullTypeName)
         {
             // Boxed types
-            case "System.UIntPtr":
             case "System.IntPtr":
             case "System.Boolean":
             case "System.Byte":

@@ -43,9 +43,6 @@ static partial class ObjCExtensions
             { "System.IntPtr", new Dictionary<ReplacementIdentity, SymbolReplacement>() {
                 { new ReplacementIdentity("Zero", ObjCSymbolUsage.Normal), new SymbolReplacement() { Name = "NULL", Kind = SymbolReplacementKind.Literal } },
             } },
-            { "System.UIntPtr", new Dictionary<ReplacementIdentity, SymbolReplacement>() {
-                { new ReplacementIdentity("Zero", ObjCSymbolUsage.Normal), new SymbolReplacement() { Name = "NULL", Kind = SymbolReplacementKind.Literal } },
-            } },
         };
     }
 

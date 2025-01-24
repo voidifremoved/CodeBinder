@@ -124,7 +124,6 @@ class JNITrampolineMethodWriter : CodeWriter<MethodDeclarationSyntax, JNIModuleC
                         switch (fullTypeName)
                         {
                             case "System.IntPtr":
-                            case "System.UIntPtr":
                             {
                                 if (symbol.IsRefLike())
                                 {

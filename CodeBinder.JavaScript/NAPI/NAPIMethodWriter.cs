@@ -105,7 +105,6 @@ class NAPITrampolineMethodWriter : CodeWriter<MethodDeclarationSyntax, NAPIModul
                                     break;
                                 } 
                                 case "System.IntPtr":
-                                case "System.UIntPtr":
                                 {
                                     string? binder;
                                     if (!param.TryGetCLangBinder(Context, out binder))
@@ -175,7 +174,6 @@ class NAPITrampolineMethodWriter : CodeWriter<MethodDeclarationSyntax, NAPIModul
                     switch (methodSymbol.ReturnType.GetFullName())
                     {
                         case "System.IntPtr":
-                        case "System.UIntPtr":
                         case "System.Boolean":
                         case "System.Byte":
                         case "System.SByte":
@@ -272,7 +270,6 @@ class NAPITrampolineMethodWriter : CodeWriter<MethodDeclarationSyntax, NAPIModul
                     switch (fullTypeName)
                     {
                         case "System.IntPtr":
-                        case "System.UIntPtr":
                         {
                             string? binder;
                             if (param.TryGetCLangBinder(true, Context, out binder))

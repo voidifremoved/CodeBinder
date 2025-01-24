@@ -293,8 +293,6 @@ class ObjCArrayBoxWriter : ConversionWriter
                 return "NSUInteger";
             case ObjCInteropType.NSInteger:
                 return "NSInteger";
-            case ObjCInteropType.UIntPtr:
-                return "void *";
             case ObjCInteropType.IntPtr:
                 return "void *";
             case ObjCInteropType.Boolean:
