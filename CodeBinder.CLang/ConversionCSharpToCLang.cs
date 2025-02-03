@@ -33,10 +33,10 @@ public class ConversionCSharpToCLang : CSharpLanguageConversionBase<CLangCompila
 
     internal const string BaseTypesHeader = "CBBaseTypes.h";
 
-    public override bool TryParseExtraArgs(List<string> args)
+    public override bool TryParseExtraArgs(List<KeyValuePair<string, string?>> args)
     {
         // Try parse --interface-only switch
-        if (args.Count == 1 && args[0] == "interface-only")
+        if (args.Count == 1 && args[0].Key == "interface-only")
         {
             PublicInterfaceOnly = true;
             return true;

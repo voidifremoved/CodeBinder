@@ -57,10 +57,10 @@ public class ConversionCSharpToTypeScript : CSharpLanguageConversion<TypeScriptC
         get { return false; }
     }
 
-    public override bool TryParseExtraArgs(List<string> args)
+    public override bool TryParseExtraArgs(List<KeyValuePair<string, string?>> args)
     {
         // Try parse --commonjs switch
-        if (args.Count == 1 && args[0] == "commonjs")
+        if (args.Count == 1 && args[0].Key == "commonjs")
         {
             GenerationFlags |= TypeScriptGenerationFlags.CommonJSCompat;
             return true;

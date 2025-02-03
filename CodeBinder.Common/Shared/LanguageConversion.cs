@@ -117,7 +117,7 @@ public abstract class LanguageConversion
         get { yield break; }
     }
 
-    public virtual bool TryParseExtraArgs(List<string> args)
+    public virtual bool TryParseExtraArgs(List<KeyValuePair<string, string?>> args)
     {
         return false;
     }

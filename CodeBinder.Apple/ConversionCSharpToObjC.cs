@@ -6,19 +6,25 @@ using BinderPolicies = CodeBinder.Attributes.Features;
 namespace CodeBinder.Apple;
 
 [ConversionLanguageName("ObjectiveC")]
+[ConfigurationSwitch("conversion-prefix", "The conversion prefix for types. The default is \"OC\"", true)]
 public class ConversionCSharpToObjC : CSharpLanguageConversion<ObjCCompilationContext>
 {
     internal const string SourcePreamble = "/* This file was generated. DO NOT EDIT! */";
 
     internal const string HeaderExtension = "h";
     internal const string ImplementationExtension = "mm";
-    internal const string ConversionPrefix = "OC";
     internal const string TypesHeader = "OCTypes.h";
     internal const string BaseTypesHeader = "CBOCBaseTypes.h";
     internal const string InternalBasePath = "Internal";
     internal const string SupportBasePath = "Support";
+    const string DefaultConversionPrefix = "OC";
 
-    public ConversionCSharpToObjC() { }
+    string _ConversionPrefix;
+
+    public ConversionCSharpToObjC()
+    {
+        _ConversionPrefix = DefaultConversionPrefix;
+    }
 
     public override string GetMethodBaseName(IMethodSymbol symbol, string? stem)
     {
@@ -33,6 +39,17 @@ public class ConversionCSharpToObjC : CSharpLanguageConversion<ObjCCompilationCo
         {
             return base.GetMethodBaseName(symbol, stem);
         }
+    }
+    public override bool TryParseExtraArgs(List<KeyValuePair<string, string?>> args)
+    {
+        // Try parse --interface-only switch
+        if (args.Count == 1 && args[0].Key == "conversion-prefix")
+        {
+            ConversionPrefix = args[0].Value;
+            return true;
+        }
+
+        return false;
     }
 
     protected override ObjCCompilationContext CreateCSharpCompilationContext()
@@ -58,6 +75,25 @@ public class ConversionCSharpToObjC : CSharpLanguageConversion<ObjCCompilationCo
     public override IReadOnlyList<string> PreprocessorDefinitions
     {
         get { return new string[] { "OBJECTIVEC", "APPLE" }; }
+    }
+
+    [AllowNull]
+    public string ConversionPrefix
+    {
+        get => _ConversionPrefix;
+        set
+        {
+            if (value == null || value.Length == 0)
+            {
+                _ConversionPrefix = DefaultConversionPrefix;
+                return;
+            }
+
+            if (value.Length > 6)
+                throw new Exception("Conversion prefix is too long (maximum 6 characters)");
+
+            _ConversionPrefix = value;
+        }
     }
 
     public override IEnumerable<IConversionWriter> DefaultConversions

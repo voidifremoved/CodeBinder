@@ -434,7 +434,7 @@ static partial class ObjCExtensions
     static string getObjCName(ITypeSymbol symbol, ObjCCompilationContext context)
     {
         if (context.IsCompilationDefined(symbol) && !symbol.HasAttribute<IgnoreAttribute>())
-            return $"{ConversionCSharpToObjC.ConversionPrefix}{symbol.Name}";
+            return $"{context.Conversion.ConversionPrefix}{symbol.Name}";
         else
         {
             if (symbol.HasAttribute<CLangTypeAttribute>())

@@ -21,9 +21,13 @@ public class ConfigurationSwitch : Attribute
     public string Name { get; private set; }
 
     public string Description { get; private set; }
-    public ConfigurationSwitch(string name, string description)
+
+    public bool AcceptValue { get; private set; }
+
+    public ConfigurationSwitch(string name, string description, bool acceptValue = false)
     {
         Name = name;
         Description = description;
+        AcceptValue = acceptValue;
     }
 }

@@ -25,10 +25,10 @@ public class ConversionCSharpToJava : CSharpLanguageConversion
 
     public override IReadOnlyCollection<string> SupportedPolicies => new string[] { Features.GarbageCollection, Features.InstanceFinalizers };
 
-    public override bool TryParseExtraArgs(List<string> args)
+    public override bool TryParseExtraArgs(List<KeyValuePair<string, string?>> args)
     {
         // Try parse --commonjs switch
-        if (args.Count == 1 && args[0] == "android")
+        if (args.Count == 1 && args[0].Key == "android")
         {
             JavaPlatform = JavaPlatform.Android;
             return true;

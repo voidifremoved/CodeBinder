@@ -11,6 +11,7 @@ using System.IO;
 using CodeBinder.Shared;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Collections.Specialized;
 
 namespace CodeBinder;
 
@@ -68,11 +69,24 @@ class Program
             { "L|list", "List all supported languages and exit", L => shouldListLanguages = L != null },
         };
 
-        var supportedExtraArgs = new List<string>();
+        var supportedExtraArgs = new List<KeyValuePair<string, string?>>();
         foreach (var conversion in conversions)
         {
             foreach (var swtch in conversion.ConfigurationSwitches)
-                options.Add(swtch.Name, swtch.Description, arg => supportedExtraArgs.Add(arg));
+            {
+                if (swtch.AcceptValue)
+                {
+                    var name = swtch.Name;
+                    options.Add($"{swtch.Name}=", swtch.Description, (arg) =>
+                    {
+                        supportedExtraArgs.Add(new KeyValuePair<string, string?>(name, arg));
+                    });
+                }    
+                else
+                {
+                    options.Add(swtch.Name, swtch.Description, (arg) => supportedExtraArgs.Add(new KeyValuePair<string, string?>(arg, null)));
+                }
+            }
         }
 
         List<string> extra = options.Parse(cmdArgs);
@@ -210,7 +224,7 @@ class Program
                 }
                 var switches = new List<ConfigurationSwitch>();
                 foreach (var data in from data in type.CustomAttributes where data.AttributeType == typeof(ConfigurationSwitch) select data)
-                    switches.Add(new ConfigurationSwitch((string)data.ConstructorArguments[0].Value!, (string)data.ConstructorArguments[1].Value!));
+                    switches.Add(new ConfigurationSwitch((string)data.ConstructorArguments[0].Value!, (string)data.ConstructorArguments[1].Value!, (bool)data.ConstructorArguments[2].Value!));
 
                 types.Add(new ConversionInfo() { Type = type, LanguageName = (string)attr.ConstructorArguments[0].Value!, ConfigurationSwitches = switches });
             }
