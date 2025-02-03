@@ -481,22 +481,8 @@ static partial class ObjCExtensions
                         objcTypeKind = tempTypeKind.Value;
                     }
 
-                    if (namedType.IsGenericType)
-                    {
-                        var typeBuilder = new CodeBuilder();
-                        typeBuilder.Append(objCTypeName);
-                        using (typeBuilder.TypeParameterList())
-                        {
-                            bool first = true;
-                            foreach (var parameter in namedType.TypeArguments)
-                                typeBuilder.CommaSeparator(ref first).Append(parameter, ObjCTypeUsageKind.Declaration, context);
-                        }
+                    handleGenericType(context, namedType, ref objCTypeName);
 
-                        objCTypeName = typeBuilder.ToString();
-                    }
-
-                    // NOTE: We don't append generic parameters here: ObjectiveC has only the so
-                    // called "lightweight generics", that are useful only for swift interop
                     TryAdaptType(ref objCTypeName, usage, objcTypeKind);
                     builder.Append(objCTypeName);
                     break;
@@ -525,6 +511,8 @@ static partial class ObjCExtensions
                         objCTypeName = underlyingType.GetObjCName(context);
                     else
                         objCTypeName = symbol.GetObjCName(context);
+
+                    handleGenericType(context, namedType, ref objCTypeName);
 
                     // NOTE: in case of named types, we don't append generic parameters here:
                     // ObjectiveC has only the so called "lightweight generics", that are useful
@@ -556,6 +544,25 @@ static partial class ObjCExtensions
                 default:
                     throw new Exception();
             }
+        }
+    }
+
+    private static void handleGenericType(ObjCCompilationContext context, INamedTypeSymbol namedType, ref string objCTypeName)
+    {
+        if (namedType.IsGenericType && !namedType.IsNullable() && namedType.TypeKind != TypeKind.Interface)
+        {
+            // NOTE: Objective C has no generic protocols!
+            // https://stackoverflow.com/a/60520687/213871
+            var typeBuilder = new CodeBuilder();
+            typeBuilder.Append(objCTypeName);
+            using (typeBuilder.TypeParameterList())
+            {
+                bool first = true;
+                foreach (var parameter in namedType.TypeArguments)
+                    typeBuilder.CommaSeparator(ref first).Append(parameter, ObjCTypeUsageKind.Declaration, context);
+            }
+
+            objCTypeName = typeBuilder.ToString();
         }
     }
 

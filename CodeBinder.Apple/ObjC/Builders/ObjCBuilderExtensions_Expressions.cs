@@ -665,9 +665,11 @@ static partial class ObjCBuilderExtension
                     builder.Append(arg.Expression, context);
                 }
 
-                if (type.TypeKind == TypeKind.Array && arg.TryGetOperation<IArgumentOperation>(context, out var operation))
+                if (type.TypeKind == TypeKind.Array)
                 {
-                    builder.Parenthesized().Append(operation.Parameter!.GetCLangParameterType()).Close();
+                    if (arg.TryGetOperation<IArgumentOperation>(context, out var operation))
+                        builder.Parenthesized().Append(operation.Parameter!.GetCLangParameterType()).Close();
+
                     builder.Append("CBGetNativeArray").Parenthesized(appendExpression);
                 }
                 else
@@ -713,7 +715,22 @@ static partial class ObjCBuilderExtension
         {
             bool first = true;
             foreach (var arg in arguments)
-                builder.Space(ref first).Colon().Append(arg.Expression, context);
+            {
+                if (arg.TryGetOperation<IArgumentOperation>(context, out var operation)
+                    && operation.Parent is IInvocationOperation invocation
+                    && invocation.TargetMethod.IsGenericMethod)
+                {
+                    // Objective C doesn't have full generics support,
+                    // in particular it doesn't have generic method:
+                    // we cast the argument to the needed type
+                    builder.Space(ref first).Colon().Parenthesized().Append(operation.Parameter!.OriginalDefinition.Type.GetObjCType(ObjCTypeUsageKind.Declaration, context)).Close().Append(arg.Expression, context);
+                }
+                else
+                {
+
+                    builder.Space(ref first).Colon().Append(arg.Expression, context);
+                }
+            }
         }
 
         return builder;
