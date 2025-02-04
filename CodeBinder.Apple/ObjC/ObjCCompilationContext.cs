@@ -37,6 +37,7 @@ public class ObjCCompilationContext : CSharpCompilationContext<ConversionCSharpT
         get
         {
             yield return new ObjCLibDefsHeaderConversion(this);
+            yield return new ObjCSymbolsExportLD64Conversion(this);
             yield return new ObjCTypesHeaderConversion(this, true);
             yield return new ObjCTypesHeaderConversion(this, false);
             yield return new ObjCLibraryHeaderConversion(this, true);

@@ -34,6 +34,20 @@ public static class DotnetMethodExtensions
         }
     }
 
+    public static bool IsException(this ITypeSymbol typeSymbol)
+    {
+        while (true)
+        {
+            if (typeSymbol.GetFullName() == "System.Exception")
+                return true;
+
+            if (typeSymbol.BaseType == null)
+                return false;
+
+            typeSymbol = typeSymbol.BaseType;
+        }
+    }
+
     public static string GetCSharpTypeName(this ITypeSymbol symbol)
     {
         switch (symbol.SpecialType)
