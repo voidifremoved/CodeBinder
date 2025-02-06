@@ -7,7 +7,6 @@
 #include <utility>
 #include <string>
 #include <cassert>
-#include <CBInterop.h>
 
 using namespace std;
 
@@ -30,8 +29,9 @@ SN2J::SN2J(JNIEnv* env, cbstring&& str)
 
 SJ2N::~SJ2N()
 {
-    if (m_isCopy)
-        m_env->ReleaseStringUTFChars(m_string, m_chars);
+    // https://stackoverflow.com/questions/5859673/should-you-call-releasestringutfchars-if-getstringutfchars-returned-a-copy
+    // ReleaseStringUTFChars shall be called unconditionally
+    m_env->ReleaseStringUTFChars(m_string, m_chars);
 }
 
 SJ2N::operator cbstring() const
@@ -90,4 +90,9 @@ AJ2NImpl<jdoubleArray, jdouble, double> AJ2N(JNIEnv* env, jdoubleArray jarray, b
 AJ2NImpl<jptrArray, void*> AJ2N(JNIEnv* env, jptrArray jarray, bool commit)
 {
     return AJ2NImpl<jptrArray, void*>(env, jarray, commit);
+}
+
+AJ2NImpl<jstringArray, cbstring> AJ2N(JNIEnv* env, jstringArray jarray, bool commit)
+{
+    return AJ2NImpl<jstringArray, cbstring>(env, jarray, commit);
 }

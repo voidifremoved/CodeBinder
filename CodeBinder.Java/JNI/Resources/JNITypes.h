@@ -34,3 +34,7 @@ typedef jobject jBoolean;
 class _jptrArray : public _jlongArray {};
 typedef _jptrArray* jptrArray;
 typedef jlong jptr;
+
+// Support class for array of strings
+class _jstringArray : public _jobjectArray { };
+typedef _jstringArray* jstringArray;

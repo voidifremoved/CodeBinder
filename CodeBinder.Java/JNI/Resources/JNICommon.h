@@ -11,6 +11,7 @@
 #include "JNIBoxes.h"
 #include "JNIOptional.h"
 #include <CBBaseTypes.h>
+#include <CBInterop.h>
 
  // Wraps jstring and convert to utf-16 chars
 class SJ2N
@@ -87,8 +88,10 @@ public:
             AJNIShim<TJArray, TNArray>::FreeNativeArray(m_env, m_jarray, m_narray, m_commit);
     }
 public:
-    inline TNArray* n_array() const { return m_narray; }
-    inline operator TNArray* () const { return m_narray; }
+    inline TNArray* n_array() { return m_narray; }
+    inline operator TNArray* () { return m_narray; }
+    inline const TNArray* n_array() const { return m_narray; }
+    inline operator const TNArray* () const { return m_narray; }
 private:
     JNIEnv* m_env;
     TJArray m_jarray;
@@ -102,7 +105,7 @@ class AJ2NImpl<TJArray, TNArray, TCArray, Args...> : public AJ2NImpl<TJArray, TN
 public:
     using AJ2NImpl<TJArray, TNArray, Args...>::AJ2NImpl;
 public:
-    inline operator TCArray* () const { return (TCArray*)AJ2NImpl<TJArray, TNArray, Args...>::n_array(); }
+    inline operator TCArray* () { return (TCArray*)AJ2NImpl<TJArray, TNArray, Args...>::n_array(); }
 };
 
 template <>
@@ -190,6 +193,55 @@ struct AJNIShim<jdoubleArray, jdouble>
 };
 
 template <>
+struct AJNIShim<jstringArray, cbstring>
+{
+    static cbstring* GetNativeArray(JNIEnv* env, jstringArray jarray)
+    {
+        jsize size = env->GetArrayLength(jarray);
+        auto ret = new cbstring[size];
+        for (jsize i = 0; i < size; i++)
+        {
+            auto jstr = (jstring)env->GetObjectArrayElement(jarray, i);
+            if (jstr == nullptr)
+            {
+                ret[i] = { };
+            }
+            else
+            {
+                jsize length = env->GetStringUTFLength(jstr);
+                jboolean isCopy;
+                auto chars = env->GetStringUTFChars(jstr, &isCopy);
+                ret[i] = CBCreateStringLen(chars, (size_t)length);
+                // NOTE: Unconditionally release the string is required
+                env->ReleaseStringUTFChars(jstr, chars);
+            }
+        }
+
+        return ret;
+    }
+
+    static void FreeNativeArray(JNIEnv* env, jstringArray jarray, cbstring* narray, bool commit)
+    {
+        jsize size = env->GetArrayLength(jarray);
+        if (commit)
+        {
+            // Set the new string on the java array
+            for (jsize i = 0; i < size; i++)
+            {
+                if (narray[i].data == nullptr)
+                    env->SetObjectArrayElement(jarray, i, nullptr);
+                else
+                    env->SetObjectArrayElement(jarray, i, env->NewStringUTF(narray[i].data));
+            }
+        }
+
+        // Free the native strings
+        for (jsize i = 0; i < size; i++)
+            CBFreeString(&narray[i]);
+    }
+};
+
+template <>
 struct AJNIShim<jptrArray, void*>
 {
     static void** GetNativeArray(JNIEnv* env, jptrArray jarray)
@@ -221,6 +273,37 @@ struct AJNIShim<jptrArray, void*>
     }
 };
 
+template <>
+class AJ2NImpl<jptrArray, void*>
+{
+public:
+    AJ2NImpl(JNIEnv* env, jptrArray array, bool commit)
+    {
+        m_env = env;
+        m_jarray = array;
+        m_commit = commit;
+        if (array == nullptr)
+            m_narray = nullptr;
+        else
+            m_narray = AJNIShim<jptrArray, void*>::GetNativeArray(env, array);
+    }
+    ~AJ2NImpl()
+    {
+        if (m_jarray != nullptr)
+            AJNIShim<jptrArray, void*>::FreeNativeArray(m_env, m_jarray, m_narray, m_commit);
+    }
+public:
+    inline void** n_array() { return m_narray; }
+    inline operator void** () { return m_narray; }
+    inline const void** n_array() const { return (const void**)m_narray; }
+    inline operator const void** () const { return (const void**)m_narray; }
+private:
+    JNIEnv* m_env;
+    jptrArray m_jarray;
+    void** m_narray;
+    bool m_commit;
+};
+
 // Function overloads to create actual implentations of convert classes
 AJ2NImpl<jbyteArray, jbyte, uint8_t, int8_t> AJ2N(JNIEnv* env, jbyteArray jarray, bool commit);
 AJ2NImpl<jshortArray, jshort, uint16_t, int16_t> AJ2N(JNIEnv* env, jshortArray jarray, bool commit);
@@ -229,3 +312,4 @@ AJ2NImpl<jlongArray, jlong, uint64_t, int64_t> AJ2N(JNIEnv* env, jlongArray jarr
 AJ2NImpl<jfloatArray, jfloat, float> AJ2N(JNIEnv* env, jfloatArray jarray, bool commit);
 AJ2NImpl<jdoubleArray, jdouble, double> AJ2N(JNIEnv* env, jdoubleArray jarray, bool commit);
 AJ2NImpl<jptrArray, void*> AJ2N(JNIEnv* env, jptrArray jarray, bool commit);
+AJ2NImpl<jstringArray, cbstring> AJ2N(JNIEnv* env, jstringArray jarray, bool commit);
