@@ -46,6 +46,8 @@ public class JNICompilationContext : CSharpCompilationContextBase<JNIModuleConte
         get
         {
             yield return new JNIMethodInitConversion(this);
+            yield return new JNISymbolsExportLD64Conversion(this);
+            yield return new JNISymbolsExportLDConversion(this);
         }
     }
 }
