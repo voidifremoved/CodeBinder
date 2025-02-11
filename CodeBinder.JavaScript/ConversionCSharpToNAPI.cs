@@ -46,7 +46,7 @@ public class ConversionCSharpToNAPI : CSharpLanguageConversionBase<NAPICompilati
 
     const string Exports_ld = """
 NAPI {
-    global: _init; _fini;
+    global:
         napi_register_module_v1;
     local: *;
 };
