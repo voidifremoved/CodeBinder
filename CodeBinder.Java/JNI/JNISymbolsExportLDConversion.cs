@@ -23,14 +23,14 @@ class JNISymbolsExportLDConversion : ConversionWriter
     protected override void write(CodeBuilder builder)
     {
         builder.AppendLine("""
-NAPI {
-    global: _init; _fini;
+JNI {
+    global:
 """);
 
         foreach (var module in Compilation.Modules)
         {
             foreach (var method in module.Methods)
-                builder.Append("        _").Append(method.GetJNIMethodName(module)).EndOfLine();
+                builder.Append("        ").Append(method.GetJNIMethodName(module)).EndOfLine();
         }
 
         builder.AppendLine("""
