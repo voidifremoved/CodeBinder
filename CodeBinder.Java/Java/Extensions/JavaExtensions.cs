@@ -31,6 +31,7 @@ static partial class JavaExtensions
             } },
             // java.lang.AutoCloseable
             { "System.Collections.Generic.List<T>", new Dictionary<string, SymbolReplacement>() {
+                { "Count", new SymbolReplacement() { Name = "size", Kind = SymbolReplacementKind.Method } },
                 { "Add", new SymbolReplacement() { Name = "add", Kind = SymbolReplacementKind.Method } },
                 { "Clear", new SymbolReplacement() { Name = "clear", Kind = SymbolReplacementKind.Method } },
             } },
@@ -47,7 +48,7 @@ static partial class JavaExtensions
 
     public static bool HasJavaReplacement(this IMethodSymbol methodSymbol, [NotNullWhen(true)]out SymbolReplacement? javaReplacement)
     {
-        var containingType = methodSymbol.ContainingType;
+        var containingType = methodSymbol.ContainingType.OriginalDefinition;
         Dictionary<string, SymbolReplacement>? replacements;
         foreach (var iface in containingType.AllInterfaces)
         {
@@ -92,8 +93,7 @@ static partial class JavaExtensions
 
     public static bool HasJavaReplacement(this IPropertySymbol propertySymbol, [NotNullWhen(true)]out SymbolReplacement? javaReplacement)
     {
-        // TODO: look for interface/overridden class
-        if (_replacements.TryGetValue(propertySymbol.ContainingType.GetFullName(), out var replacements))
+        if (_replacements.TryGetValue(propertySymbol.ContainingType.OriginalDefinition.GetFullName(), out var replacements))
             return replacements.TryGetValue(propertySymbol.Name, out javaReplacement);
 
         javaReplacement = null;
@@ -102,7 +102,7 @@ static partial class JavaExtensions
 
     public static bool HasJavaReplacement(this IFieldSymbol fieldSymbol, [NotNullWhen(true)]out SymbolReplacement? replacement)
     {
-        if (_replacements.TryGetValue(fieldSymbol.ContainingType.GetFullName(), out var replacements))
+        if (_replacements.TryGetValue(fieldSymbol.ContainingType.OriginalDefinition.GetFullName(), out var replacements))
             return replacements.TryGetValue(fieldSymbol.Name, out replacement);
 
         replacement = null;

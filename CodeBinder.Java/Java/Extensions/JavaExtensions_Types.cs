@@ -273,6 +273,9 @@ static partial class JavaExtensions
                             case "CodeBinder.cbstring":
                                 javaType = "StringBox";
                                 break;
+                            case "CodeBinder.cboptbool":
+                                javaType = "Boolean";
+                                break;
                             case "CodeBinder.cbbool":
                                 javaType = "BooleanBox";
                                 break;
@@ -379,9 +382,20 @@ static partial class JavaExtensions
         if (property.HasJavaReplacement(out propertyReplacement))
         {
             if (isSetter)
+            {
+                if (propertyReplacement.Kind == SymbolReplacementKind.Method)
+                    throw new NotImplementedException();
+
                 builder.Append(propertyReplacement.SetterName);
+            }
             else
-                builder.Append(propertyReplacement.Name);
+
+            {
+                if (propertyReplacement.Kind == SymbolReplacementKind.Method)
+                    builder.Append(propertyReplacement.Name).EmptyParameterList();
+                else
+                    builder.Append(propertyReplacement.Name);
+            }
         }
         else
         {
@@ -849,6 +863,9 @@ static partial class JavaExtensions
                     return true;
                 case "CodeBinder.cbstring":
                     knownJavaType = "String";
+                    return true;
+                case "CodeBinder.cboptbool":
+                    knownJavaType = "Boolean";
                     return true;
                 case "System.String":
                     knownJavaType = "String";
