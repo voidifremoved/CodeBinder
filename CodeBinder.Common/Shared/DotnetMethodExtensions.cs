@@ -722,10 +722,9 @@ public static class DotnetMethodExtensions
     /// <summary>
     /// Get no namespace qualified name
     /// </summary>
-    public static string GetQualifiedName(this ISymbol symbol, bool includeTypeParameters = true)
+    public static string GetQualifiedName(this ISymbol symbol)
     {
-        var ret = SymbolDisplay.ToDisplayString(symbol, includeTypeParameters
-            ? DisplayFormats.QualifiedFormat : DisplayFormats.QualifiedFormatNoTypeParameters);
+        var ret = SymbolDisplay.ToDisplayString(symbol, DisplayFormats.QualifiedFormat);
         if (ret == "nint") // NOTE: Something strange happened with C# 9.0
             return "System.IntPtr";
         else

@@ -680,12 +680,6 @@ public static class CSharpMethodExtensions
         return symbol.GetQualifiedName();
     }
 
-    public static string GetQualifiedName(this MemberDeclarationSyntax node, bool includeTypeParameters, ICompilationProvider provider)
-    {
-        var symbol = node.GetDeclaredSymbol(provider)!;
-        return symbol.GetQualifiedName(includeTypeParameters);
-    }
-
     public static string GetFullName(this TypeSyntax node, ICompilationProvider provider)
     {
         var symbol = node.GetTypeSymbolThrow(provider);
@@ -696,12 +690,6 @@ public static class CSharpMethodExtensions
     {
         var symbol = node.GetTypeSymbolThrow(provider);
         return symbol.GetQualifiedName();
-    }
-
-    public static string GetQualifiedName(this TypeSyntax node, bool includeTypeParameters, ICompilationProvider provider)
-    {
-        var symbol = node.GetTypeSymbolThrow(provider);
-        return symbol.GetQualifiedName(includeTypeParameters);
     }
 
     /// <summary>
