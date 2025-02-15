@@ -34,6 +34,11 @@ public sealed class ImportAttribute : CodeBinderAttribute
 
     public string? Condition { get; set; }
 
+    /// <summary>
+    /// To be used only in private implementation
+    /// </summary>
+    public bool Private { get; set; }
+
     public ImportAttribute(string name)
     {
         Name = name;
