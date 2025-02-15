@@ -43,8 +43,11 @@ public class JNICollectionContext : CSharpCollectionContextBase<JNICompilationCo
 
                 foreach (var attribute in type.GetAttributes<ImportAttribute>(this))
                 {
-                    var include = new ImportAttribute(attribute.GetConstructorArgument<string>(0)) {
-                        Condition = attribute.GetNamedArgument<string?>("Condition") };
+                    var include = new ImportAttribute(attribute.GetConstructorArgument<string>(0));
+                    if (attribute.TryGetNamedArgument("Condition", out string? cond))
+                        include.Condition = cond;
+                    if (attribute.TryGetNamedArgument("Private", out bool priv))
+                        include.Private = priv;
                     parent.AddInclude(include);
                 }
             }

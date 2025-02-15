@@ -411,24 +411,6 @@ public static class DotnetMethodExtensions
         return ret!;
     }
 
-    public static T GetNamedArgument<T>(this AttributeData data, string name)
-    {
-        T ret;
-        if (!TryGetNamedArgument(data, name, out ret))
-            throw new KeyNotFoundException();
-
-        return ret;
-    }
-
-    public static T[]? GetNamedArgumentArray<T>(this AttributeData data, string name)
-    {
-        T[]? ret;
-        if (!TryGetNamedArgument(data, name, out ret))
-            throw new KeyNotFoundException();
-
-        return ret;
-    }
-
     public static bool TryGetNamedArgument<T>(this AttributeData data, string name, [NotNullWhen(true)]out T value)
     {
         foreach (var pair in data.NamedArguments)

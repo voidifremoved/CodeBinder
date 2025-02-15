@@ -1,6 +1,8 @@
 ﻿// SPDX-FileCopyrightText: (C) 2020 Francesco Pretto <ceztko@gmail.com>
 // SPDX-License-Identifier: MIT
 
+using CodeBinder.Attributes;
+
 namespace CodeBinder.Apple;
 
 partial class ObjCTypeConversion<TTypeContext>
@@ -35,6 +37,21 @@ partial class ObjCTypeConversion<TTypeContext>
                     yield return $"\"{nameof(ObjCResources.CBOCInterop_h).ToObjCHeaderFilename()}\"";
                 }
                 yield return $"<{Compilation.CLangLibraryHeaderName}>";
+                var attributes = Context.Node.GetAttributes(this);
+                foreach (var attribute in attributes)
+                {
+                    if (attribute.IsAttribute<ImportAttribute>())
+                    {
+                        var include = new ImportAttribute(attribute.GetConstructorArgument<string>(0));
+                        if (attribute.TryGetNamedArgument("Condition", out string? cond))
+                            include.Condition = cond;
+                        if (attribute.TryGetNamedArgument("Private", out bool priv))
+                            include.Private = priv;
+
+                        if (include.Private)
+                            yield return include.Name;
+                    }
+                }
             }
         }
 
