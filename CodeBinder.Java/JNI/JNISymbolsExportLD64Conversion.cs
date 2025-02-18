@@ -22,6 +22,7 @@ class JNISymbolsExportLD64Conversion : ConversionWriter
 
     protected override void write(CodeBuilder builder)
     {
+        builder.AppendLine("_JNI_OnLoad");
         foreach (var module in Compilation.Modules)
         {
             foreach (var method in module.Methods)

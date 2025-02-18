@@ -25,6 +25,7 @@ class JNISymbolsExportLDConversion : ConversionWriter
         builder.AppendLine("""
 JNI {
     global:
+        JNI_OnLoad;
 """);
 
         foreach (var module in Compilation.Modules)
