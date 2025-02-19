@@ -5,16 +5,31 @@
 
 #import "CBOCInterop.h"
 
+namespace
+{
+    struct ThreadLocalException
+    {
+        NSException* Exception;
+    };
+}
+
+thread_local ThreadLocalException s_exception;
+
 @implementation CBBinderUtils
 
     +(void)setException:(NSException*)exception
     {
-        @throw exception;
+        s_exception.Exception = exception;
     }
 
     +(void)checkException
     {
-        // Do nothing
+        if (s_exception.Exception != Nil)
+        {
+            NSException* exception = s_exception.Exception;
+            s_exception.Exception = Nil;
+            @throw exception;
+        }
     }
 
     +(void)keepAlive:(NSObject*)obj;
