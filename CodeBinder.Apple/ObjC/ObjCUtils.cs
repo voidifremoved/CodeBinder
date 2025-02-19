@@ -321,7 +321,7 @@ static class ObjCUtils
                 boxTypeName = "CBInt64Array";
                 return true;
             case "System.Single":
-                boxTypeName = "CBFloatArray";
+                boxTypeName = "CBSingleArray";
                 return true;
             case "System.Double":
                 boxTypeName = "CBDoubleArray";
@@ -349,7 +349,7 @@ static class ObjCUtils
             ObjCInteropType.Int32 => "CBInt32Array",
             ObjCInteropType.UInt64 => "CBUInt64Array",
             ObjCInteropType.Int64 => "CBInt64Array",
-            ObjCInteropType.Single => "CBFloatArray",
+            ObjCInteropType.Single => "CBSingleArray",
             ObjCInteropType.Double => "CBDoubleArray",
             _ => throw new NotSupportedException(),
         };

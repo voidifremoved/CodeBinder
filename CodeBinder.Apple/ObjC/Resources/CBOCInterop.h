@@ -233,7 +233,7 @@ inline int64_t* CBGetNativeArray(CBInt64Array* arr)
     return arr.data;
 }
 
-inline float* CBGetNativeArray(CBFloatArray* arr)
+inline float* CBGetNativeArray(CBSingleArray* arr)
 {
     if (arr == nil)
         return nullptr;

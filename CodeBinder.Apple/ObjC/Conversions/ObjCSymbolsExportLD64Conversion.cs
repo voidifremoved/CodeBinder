@@ -18,8 +18,8 @@ _OBJC_METACLASS_$_CBException
 _OBJC_EHTYPE_$_CBException
 _OBJC_CLASS_$_CBFinalizableObject
 _OBJC_METACLASS_$_CBFinalizableObject
-_OBJC_CLASS_$_CBFloatArray
-_OBJC_METACLASS_$_CBFloatArray
+_OBJC_CLASS_$_CBSingleArray
+_OBJC_METACLASS_$_CBSingleArray
 _OBJC_CLASS_$_CBHandleRef
 _OBJC_METACLASS_$_CBHandleRef
 _OBJC_CLASS_$_CBHandledObject
