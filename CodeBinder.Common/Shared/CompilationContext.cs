@@ -72,25 +72,25 @@ public abstract class CompilationContext<TTypeContext, TVisitor> : CompilationCo
 public abstract class CompilationContext : CompilationProvider
 {
     HashSet<string> _Namespaces;
-    Dictionary<ISymbol, BindedName> _bindedMethodNames;
+    Dictionary<ISymbol, MethodBoundName> _boundMethodNames;
 
     internal CompilationContext()
     {
         _Namespaces = new HashSet<string>();
-        _bindedMethodNames = new Dictionary<ISymbol, BindedName>(SymbolEqualityComparer.Default);
+        _boundMethodNames = new Dictionary<ISymbol, MethodBoundName>(SymbolEqualityComparer.Default);
     }
 
-    public bool TryGetBindedName(ISymbol symbol, out BindedName name)
+    public bool TryGetBoundName(ISymbol symbol, out MethodBoundName name)
     {
-        if (_bindedMethodNames.TryGetValue(symbol, out name))
+        if (_boundMethodNames.TryGetValue(symbol, out name))
             return true;
 
         return false;
     }
 
-    internal void AddBinding(ISymbol symbol, string bindedName, bool isOverload)
+    internal void AddBinding(ISymbol symbol, string boundName, bool isOverload)
     {
-        _bindedMethodNames.Add(symbol, new BindedName() { Name = bindedName, IsOverload = isOverload });
+        _boundMethodNames.Add(symbol, new MethodBoundName() { Name = boundName, IsOverload = isOverload });
     }
 
     internal protected abstract CollectionContext CreateCollectionContext();
@@ -104,16 +104,7 @@ public abstract class CompilationContext : CompilationProvider
 
     public IReadOnlyCollection<string> Namespaces => _Namespaces;
 
-    internal IEnumerable<ConversionDelegate> ConversionDelegates
-    {
-        get
-        {
-            foreach (var conversion in DefaultConversions)
-                yield return new ConversionDelegate(conversion);
-        }
-    }
-
-    // Compilation wide default converions, see CLangCompilationContext for some examples
+    // Compilation wide default conversions, see CLangCompilationContext for some examples
     public virtual IEnumerable<IConversionWriter> DefaultConversions
     {
         get { yield break; }
@@ -192,7 +183,7 @@ public class CompilationProvider : ICompilationProvider
     }
 }
 
-public struct BindedName
+public struct MethodBoundName
 {
     public string Name;
     public bool IsOverload;

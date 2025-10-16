@@ -45,7 +45,6 @@ private:
     jStringBox m_box;
     jstring m_jstring;
     const char* m_chars;
-    jboolean m_isCopy;
     cbstring m_value;
 };
 

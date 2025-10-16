@@ -14,12 +14,12 @@ SBJ2N::SBJ2N(JNIEnv* env, jStringBox box)
     if (m_jstring == nullptr)
     {
         m_chars = nullptr;
-        m_isCopy = false;
         m_value = { };
     }
     else
     {
-        m_chars = m_env->GetStringUTFChars(m_jstring, &m_isCopy);
+        jboolean isCopy;
+        m_chars = m_env->GetStringUTFChars(m_jstring, &isCopy);
         jsize length = env->GetStringUTFLength(m_jstring);
         m_value = CBCreateStringViewLen(m_chars, (size_t)length);
     }
@@ -35,7 +35,9 @@ SBJ2N::~SBJ2N()
             m_box->SetValue(m_env, m_env->NewStringUTF(m_value.data));
     }
 
-    if (m_isCopy)
+    // https://stackoverflow.com/questions/5859673/should-you-call-releasestringutfchars-if-getstringutfchars-returned-a-copy
+    // ReleaseStringUTFChars shall be called unconditionally
+    if (m_jstring != nullptr)
         m_env->ReleaseStringUTFChars(m_jstring, m_chars);
 
     CBFreeString(&m_value);

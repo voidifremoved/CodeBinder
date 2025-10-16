@@ -352,7 +352,7 @@ static partial class ObjCExtensions
         if (method.HasObjCReplacement(usage, out replacement))
             return replacement.Name;
 
-        if (context.TryGetBindedName(method, out var bindedName))
+        if (context.TryGetBoundName(method, out var bindedName))
             return bindedName.Name;
 
         if (method.IsNative())

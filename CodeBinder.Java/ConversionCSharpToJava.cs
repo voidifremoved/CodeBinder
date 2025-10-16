@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 using CodeBinder.Attributes;
 using CodeBinder.Java.Shared;
+using System.Text;
 
 namespace CodeBinder.Java;
 
@@ -23,11 +24,11 @@ public class ConversionCSharpToJava : CSharpLanguageConversion
 
     public override MethodCasing MethodCasing => MethodCasing.LowerCamelCase;
 
-    public override IReadOnlyCollection<string> SupportedPolicies => new string[] { Features.GarbageCollection, Features.InstanceFinalizers };
+    public override IReadOnlyCollection<string> SupportedPolicies => [ Features.GarbageCollection, Features.InstanceFinalizers ];
 
     public override bool TryParseExtraArgs(List<KeyValuePair<string, string?>> args)
     {
-        // Try parse --commonjs switch
+        // Try parse --android switch
         if (args.Count == 1 && args[0].Key == "android")
         {
             JavaPlatform = JavaPlatform.Android;
@@ -35,6 +36,28 @@ public class ConversionCSharpToJava : CSharpLanguageConversion
         }
 
         return false;
+    }
+
+    protected override IEnumerable<IConversionWriter> GetContextConversions(CSharpCompilationContext context)
+    {
+        var namespaces = new HashSet<string>();
+        foreach (var type in context.Types)
+            namespaces.Add(type.Node.GetContainingNamespaceName(context));
+
+        var javaNamespaces = new List<string>();
+        foreach (var ns in namespaces)
+            javaNamespaces.Add(NamespaceMapping.GetMappedNamespace(ns, NamespaceNormalization.LowerCase));
+
+        foreach (var ns in javaNamespaces)
+        {
+            var splittedNs = ns.Split('.');
+            var currNs = new List<string>();
+            for (int i = 0; i < splittedNs.Length; i++)
+            {
+                currNs.Add(splittedNs[i]);
+                yield return new JavaDummyNamespaceConversion(currNs.ToArray());
+            }
+        }
     }
 
     public override IEnumerable<TypeConversion<CSharpClassTypeContext>> GetConversions(CSharpClassTypeContext cls)
@@ -74,9 +97,9 @@ public class ConversionCSharpToJava : CSharpLanguageConversion
             switch (JavaPlatform)
             {
                 case JavaPlatform.JDK:
-                    return new string[] { "JAVA", "JVM", "JVM_JDK", "JNI_JDK" };
+                    return ["JAVA", "JVM", "JVM_JDK", "JNI_JDK"];
                 case JavaPlatform.Android:
-                    return new string[] { "JAVA", "JVM", "JVM_ANDROID", "JNI_ANDROID" };
+                    return ["JAVA", "JVM", "JVM_ANDROID", "JNI_ANDROID"];
                 default:
                     throw new NotSupportedException();
             }

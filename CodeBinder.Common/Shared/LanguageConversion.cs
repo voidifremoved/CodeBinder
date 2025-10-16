@@ -19,6 +19,17 @@ public abstract class LanguageConversion<TCompilationContext, TTypeContext, TVis
     internal protected abstract override TCompilationContext CreateCompilationContext();
 
     internal protected abstract override ValidationContext<TVisitor>? CreateValidationContext();
+
+    protected virtual IEnumerable<IConversionWriter> GetContextConversions(TCompilationContext context)
+    {
+        yield break;
+    }
+
+    protected internal override IEnumerable<IConversionWriter> EnumerateContextConversions(CompilationContext context)
+    {
+        foreach (var conversion in GetContextConversions((TCompilationContext)context))
+            yield return conversion;
+    }
 }
 
 /// <summary>
@@ -38,12 +49,14 @@ public abstract class LanguageConversion
 
     internal protected abstract ValidationContext? CreateValidationContext();
 
+    internal protected abstract IEnumerable<IConversionWriter> EnumerateContextConversions(CompilationContext context);
+
     /// <summary>
     /// Add here policies supported by this language conversion
     /// </summary>
     public virtual IReadOnlyCollection<string> SupportedPolicies
     {
-        get { return new string[] { }; }
+        get { return Array.Empty<string>(); }
     }
 
     public virtual string GetMethodBaseName(IMethodSymbol symbol, string? stem = null)
@@ -96,7 +109,7 @@ public abstract class LanguageConversion
     /// <summary>
     /// Method name casing
     /// </summary>
-    public virtual MethodCasing MethodCasing => MethodCasing.Undefinied;
+    public virtual MethodCasing MethodCasing => MethodCasing.Undefined;
 
     /// <summary>
     /// Namespace mapping store
@@ -163,6 +176,6 @@ public abstract class LanguageConversion
 
 public enum MethodCasing
 {
-    Undefinied = 0,
+    Undefined = 0,
     LowerCamelCase
 }

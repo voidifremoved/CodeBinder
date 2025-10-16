@@ -85,6 +85,17 @@ public abstract class CSharpLanguageConversionBase<TCompilationContext, TTypeCon
     protected CSharpLanguageConversionBase() { }
 
     internal protected abstract override TCompilationContext CreateCompilationContext();
+
+    protected virtual IEnumerable<IConversionWriter> GetContextConversions(TCompilationContext context)
+    {
+        yield break;
+    }
+
+    protected internal override IEnumerable<IConversionWriter> EnumerateContextConversions(CompilationContext context)
+    {
+        foreach (var conversion in GetContextConversions((TCompilationContext)context))
+            yield return conversion;
+    }
 }
 
 /// <summary>

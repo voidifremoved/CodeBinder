@@ -104,9 +104,12 @@ class ProjectConverter
                 yield return new ConversionDelegate(conv);
         }
 
-        // Emit also out of context items
-        foreach (var defaultConversion in compilationContext.ConversionDelegates)
-            yield return defaultConversion;
+        foreach (var conv in conversion.EnumerateContextConversions(compilationContext))
+            yield return new ConversionDelegate(conv);
+
+        // Emit also context specific items
+        foreach (var conv in compilationContext.DefaultConversions)
+            yield return new ConversionDelegate(conv);
     }
 
     void checkCompilationErrors(Compilation compilation)

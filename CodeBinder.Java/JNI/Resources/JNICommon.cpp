@@ -31,7 +31,8 @@ SJ2N::~SJ2N()
 {
     // https://stackoverflow.com/questions/5859673/should-you-call-releasestringutfchars-if-getstringutfchars-returned-a-copy
     // ReleaseStringUTFChars shall be called unconditionally
-    m_env->ReleaseStringUTFChars(m_string, m_chars);
+    if (m_string != nullptr)
+        m_env->ReleaseStringUTFChars(m_string, m_chars);
 }
 
 SJ2N::operator cbstring() const

@@ -144,7 +144,7 @@ static partial class TypeScriptExtensions
         }
 
 
-        if (context.TryGetBindedName(method, out var bindedName))
+        if (context.TryGetBoundName(method, out var bindedName))
         {
             isOverload = bindedName.IsOverload;
             return bindedName.Name;
