@@ -62,7 +62,7 @@ function getLibraryPath(libFileName: string): string
         if (Context.Conversion.GenerationFlags.HasFlag(TypeScriptGenerationFlags.CommonJSCompat))
             builder.AppendLine($"    return path.join(__dirname, rid, libFileName);");
         else
-            builder.AppendLine($"    return fileURLToPath(new URL(path.join(arch, libFileName), import.meta.url));");
+            builder.AppendLine($"    return fileURLToPath(new URL(path.join(rid, libFileName), import.meta.url));");
 
         builder.AppendLine(
 """
