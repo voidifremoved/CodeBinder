@@ -26,16 +26,16 @@ class TypeScriptNAPIWrapperWriter : TypeScriptConversionWriter
 
         builder.AppendLine("""
 const archsMap: { [key: string]: any } = {
-    'win32|x86': 'Win32',
-    'win32|x64': 'Win64',
-    'linux|x64': 'linux-x86_64',
-    'darwin|x64': 'macos-x86_64',
-    'darwin|arm64': 'macos-arm64',
+    'win32|x86': 'win-x86',
+    'win32|x64': 'win-x64',
+    'linux|x64': 'linux-x64',
+    'darwin|x64': 'osx-x64',
+    'darwin|arm64': 'osx-arm64',
   };
 
 let narch = `${proc.platform}|${proc.arch}`
-let arch = archsMap[narch];
-if (arch === undefined)
+let rid = archsMap[narch];
+if (rid === undefined)
     throw new Error(`Unsupported architecture ${narch}`);
 
 let shprefix = 'lib';
@@ -60,7 +60,7 @@ function getLibraryPath(libFileName: string): string
 """);
 
         if (Context.Conversion.GenerationFlags.HasFlag(TypeScriptGenerationFlags.CommonJSCompat))
-            builder.AppendLine($"    return path.join(__dirname, arch, libFileName);");
+            builder.AppendLine($"    return path.join(__dirname, rid, libFileName);");
         else
             builder.AppendLine($"    return fileURLToPath(new URL(path.join(arch, libFileName), import.meta.url));");
 
