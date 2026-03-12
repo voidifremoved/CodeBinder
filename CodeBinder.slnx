@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="COPYING.txt" />
+    <File Path="LICENSE.txt" />
+    <File Path="README.txt" />
+    <File Path="TODO.txt" />
+  </Folder>
+  <Project Path="CodeBinder.Apple.Redist/CodeBinder.Apple.Redist.csproj" />
+  <Project Path="CodeBinder.Apple/CodeBinder.Apple.csproj" />
+  <Project Path="CodeBinder.CLang/CodeBinder.CLang.csproj" />
+  <Project Path="CodeBinder.Common/CodeBinder.Common.csproj" />
+  <Project Path="CodeBinder.Java/CodeBinder.Java.csproj" />
+  <Project Path="CodeBinder.JavaScript/CodeBinder.JavaScript.csproj" />
+  <Project Path="CodeBinder.NativeAOT/CodeBinder.NativeAOT.csproj" />
+  <Project Path="CodeBinder.Redist/CodeBinder.Redist.csproj" />
+  <Project Path="CodeBinder/CodeBinder.csproj" />
+  <Project Path="Sample/Sample.csproj" />
+</Solution>
