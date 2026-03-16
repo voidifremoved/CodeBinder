@@ -1,7 +1,9 @@
-package com.codebinder.maven;
+package com.rubberjam.codebinder;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+
+import com.rubberjam.codebinder.CodeBinderMojo;
 
 import java.io.File;
 import java.nio.file.Path;

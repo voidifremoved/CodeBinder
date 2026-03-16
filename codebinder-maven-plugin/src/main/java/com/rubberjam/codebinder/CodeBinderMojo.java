@@ -1,4 +1,4 @@
-package com.codebinder.maven;
+package com.rubberjam.codebinder;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
