@@ -6,13 +6,13 @@ Build a Maven plugin that wraps the CodeBinder CLI to convert C# source to Java,
 
 ### Maven Plugin Project
 
-#### [NEW] [pom.xml](file:///c:/Users/Dave/git/CodeBinder/codebinder-maven-plugin/pom.xml)
+#### [DONE] [pom.xml](file:///c:/Users/Dave/git/CodeBinder/codebinder-maven-plugin/pom.xml)
 Maven plugin project (`maven-plugin` packaging) with:
 - `maven-plugin-api` + `maven-plugin-annotations` dependencies
 - JUnit 5 + `maven-plugin-testing-harness` for integration tests
 - Java 23 source/target
 
-#### [NEW] [CodeBinderMojo.java](file:///c:/Users/Dave/git/CodeBinder/codebinder-maven-plugin/src/main/java/com/codebinder/maven/CodeBinderMojo.java)
+#### [DONE] [CodeBinderMojo.java](file:///c:/Users/Dave/git/CodeBinder/codebinder-maven-plugin/src/main/java/com/codebinder/maven/CodeBinderMojo.java)
 The `@Mojo(name = "generate")` that:
 - Accepts configuration: `sourceDirectory`, `outputDirectory`, `namespaceMappings`, `projectFile`, `solutionFile`
 - Locates dotnet SDK and the CodeBinder CLI project
@@ -20,17 +20,17 @@ The `@Mojo(name = "generate")` that:
 - Adds generated Java sources to the Maven compilation source roots
 - Handles error reporting from CodeBinder stderr
 
-#### [NEW] [CodeBinderMojoTest.java](file:///c:/Users/Dave/git/CodeBinder/codebinder-maven-plugin/src/test/java/com/codebinder/maven/CodeBinderMojoTest.java)
+#### [DONE] [CodeBinderMojoTest.java](file:///c:/Users/Dave/git/CodeBinder/codebinder-maven-plugin/src/test/java/com/codebinder/maven/CodeBinderMojoTest.java)
 Integration test verifying the plugin invokes CodeBinder and produces Java output.
 
 ---
 
 ### Unity Game State Test Project
 
-#### [NEW] [UnityGameState.csproj](file:///c:/Users/Dave/git/CodeBinder/Test/UnityGameState/UnityGameState.csproj)
+#### [DONE] [UnityGameState.csproj](file:///c:/Users/Dave/git/CodeBinder/Test/UnityGameState/UnityGameState.csproj)
 Minimal .NET project with C# game state classes — no Unity runtime dependency.
 
-#### [NEW] [GameState.cs](file:///c:/Users/Dave/git/CodeBinder/Test/UnityGameState/GameState.cs)
+#### [DONE] [GameState.cs](file:///c:/Users/Dave/git/CodeBinder/Test/UnityGameState/GameState.cs)
 Representative game state logic using:
 - Enums (player state, item types)
 - Classes with properties and methods
